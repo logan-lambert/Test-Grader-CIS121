@@ -14,19 +14,21 @@ and student scores to a separate file specified by user.
 """
 
 from functions import *
+from Test import Test
 import os
 
 if __name__ == "__main__":
     test_result_dir = input("Enter a name for the test result file: ") + ".txt"
     _ = input("Press enter to start")
  
-    student_tests = []
-    graded_info = []
+    student_tests: list[Test] = []
+    scores: list[int] = []
 
     # Loops througn tests folder and reads each file
-    for file in os.listdir("./tests"):
-        if file.endswith(".txt"):
-            test = read_txt_file(f"./tests/{file}")
+    for file in os.listdir("./"):
+        if not file.startswith("answer_key") and file.endswith(".txt"):
+            test_content = read_txt_file(file)
+            test = Test(test_content[0], test_content[1:])
             student_tests.append(test)
     
     # Reads answer key file
@@ -34,12 +36,12 @@ if __name__ == "__main__":
 
     # Grades individual tests and records results into graded_info list
     for test in student_tests:
-        graded_test = grader(test, answer_key)
-        graded_info.append(graded_test)
+        test.grade(answer_key)
+        scores.append(test.return_score())
     
-    class_average = class_average_calc(graded_info)
-
+    class_average = class_average_calc(scores)
+    
     # Writes test results to specified file
-    write_scores(test_result_dir, graded_info, class_average)
+    write_scores(test_result_dir, student_tests, class_average)
 
     print(f"Results posted successfully in {test_result_dir}")
